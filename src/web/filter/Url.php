@@ -127,6 +127,7 @@ class Url implements IFilter
 
         $ctl->method = $func;
         $ctl->args = $args;
+        $ctl->path = implode('/', $segs);
 
         // call method _before
         if (is_callable(array($ctl, self::METHOD_BEFORE))) {

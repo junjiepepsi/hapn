@@ -52,6 +52,12 @@ class Controller
      */
     public $args;
 
+    /**
+     * Relative path
+     * @var
+     */
+    public $path;
+
     public function _before()
     {
     }
@@ -125,8 +131,11 @@ class Controller
      * @return $this
      * @see Response::setView
      */
-    public function setView(string $tpl)
+    public function setView(string $tpl = '')
     {
+        if (!$tpl) {
+            $tpl = $this->path.'/'.$this->method.'.phtml';
+        }
         $this->response->setView($tpl);
         return $this;
     }
