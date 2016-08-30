@@ -13,7 +13,8 @@
   "require": {
     "php": ">=7.0.0",
     "ext-mbstring": "*",
-    "squizlabs/php_codesniffer": "^2.6"
+    "squizlabs/php_codesniffer": "^2.6",
+    "phpunit/phpunit": "^5.5"
   },
   "authors": [
     {
