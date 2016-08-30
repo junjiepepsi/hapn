@@ -2,9 +2,9 @@
 
 namespace hapn\web;
 
+use hapn\apiproxy\ApiProxy;
 use hapn\Exception;
 use hapn\util\Conf;
-use hapn\util\Logger;
 use hapn\web\filter\Executor;
 use hapn\web\http\Request;
 use hapn\web\http\Response;
@@ -116,6 +116,7 @@ class Application extends \hapn\Application
     {
         // init web request
         $this->appId = $this->genAppId();
+        $GLOBALS['__HapN_appid'] = $this->appId;
 
         $this->request = new Request($this);
 
@@ -130,6 +131,11 @@ class Application extends \hapn\Application
 
         $this->initEnv();
         $this->initLog();
+
+        if (true !== Conf::get('hapn.disable_apiproxy')) {
+            //没有强制关闭
+            $this->initApiProxy();
+        }
 
         if (true !== Conf::get('hapn.disable_db')) {
             //没有强制关闭
@@ -214,6 +220,37 @@ class Application extends \hapn\Application
         );
 
         $this->filterExecutor->loadFilters($filters);
+    }
+
+    /**
+     * Initialize ApiProxy
+     */
+    protected function initApiProxy()
+    {
+        $servers = Conf::get('apiproxy.servers', array());
+        if ($this->debug) {
+            foreach ($servers as $key => $server) {
+                //如果调试模式
+                $servers[$key]['curlopt'][CURLOPT_VERBOSE] = true;
+            }
+        }
+        $modmap = Conf::get('apiproxy.mod', array());
+        ApiProxy::init(
+            [
+                'servers' => $servers,
+                'mod' => $modmap,
+                'encoding' => $this->encoding,
+            ], [
+                'app_root' => $this->getNamespace("app"),
+                'conf_root' => defined('CONF_ROOT') ? CONF_ROOT : $this->getDir('conf') . 'app/',
+            ]
+        );
+        $intercepterclasses = Conf::get('apiproxy.intercepters', array());
+        $intercepters = array();
+        foreach ($intercepterclasses as $class) {
+            $intercepters[] = new $class();
+        }
+        ApiProxy::setGlobalInterceptors($intercepters);
     }
 
     /**

@@ -162,9 +162,17 @@ abstract class Application
     }
 
     /**
+     * Init ApiProxy
+     */
+    protected function initApiProxy()
+    {
+
+    }
+
+    /**
      * Initialize database
      */
-    public function initDB()
+    protected function initDB()
     {
         $conf = Conf::get('db.conf');
         $readonly = Conf::get('db.readonly', false);
@@ -211,7 +219,7 @@ abstract class Application
         if (isset($this->errorTypeMap[$error[0]])) {
             $logLevel = $this->errorTypeMap[$error[0]];
             call_user_func(
-                'Logger::' . $logLevel,
+                '\\hapn\\util\\Logger::' . $logLevel,
                 'caught ' . $logLevel . ', errno:%d,errmsg:%s,file:%s,line:%d',
                 $error[0],
                 $error[1],
