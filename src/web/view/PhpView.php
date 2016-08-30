@@ -21,7 +21,7 @@ class PhpView implements IView
     /**
      * @var Application
      */
-    private $app;
+    public $app;
 
     /**
      * ReflectionMethods of providers

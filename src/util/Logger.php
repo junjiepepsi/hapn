@@ -192,8 +192,9 @@ class Logger
         if (!isset(self::$logLevels[$level])) {
             return;
         }
+
         $intLevel = self::$logLevels[$level];
-        if ($intLevel < self::$level) {
+        if ($intLevel > self::$level) {
             return;
         }
 
