@@ -8,6 +8,7 @@ use hapn\util\Conf;
 use hapn\web\filter\Executor;
 use hapn\web\http\Request;
 use hapn\web\http\Response;
+use hapn\web\view\PhpView;
 
 /**
  * Application of web request
@@ -240,7 +241,8 @@ class Application extends \hapn\Application
                 'servers' => $servers,
                 'mod' => $modmap,
                 'encoding' => $this->encoding,
-            ], [
+            ],
+            [
                 'app_root' => $this->getNamespace("app"),
                 'conf_root' => defined('CONF_ROOT') ? CONF_ROOT : $this->getDir('conf') . 'app/',
             ]
@@ -380,7 +382,35 @@ class Application extends \hapn\Application
             echo "<br/>Redirect: <a href='$url'>$url</a><br/>";
         } else {
             ob_clean();
+
             if ($url) {
+                if ($url[0] == '!') {
+                    $response = new Response($this);
+                    switch ($errcode) {
+                        case Exception::EXCEPTION_NOT_FOUND:
+                            $response->setHeader('HTTP/1.1 404 Not Found');
+                            break;
+                        case Exception::EXCEPTION_NO_POWER:
+                            $response->setHeader('HTTP/1.1 401 Unauthorized');
+                            break;
+                        case Exception::EXCEPTION_FATAL:
+                            $this->setHeader('HTTP/1.1 500 Internal Server Error');
+                            break;
+                    }
+                    $this->request->userDatas = [];
+                    $response->outputs = [];
+                    $response->sets(
+                        [
+                            'rawUri' => $this->request->rawUri,
+                            'code' => $errcode,
+                        ]
+                    );
+                    $response->setView(substr($url, 1) . '.phtml');
+                    $response->send();
+                    exit();
+                }
+
+
                 $metaUrl = "<meta http-equiv=\"refresh\" content=\"0; url={$url}\"/>";
                 $redirectDesc = "Redirect to:{$url}";
             } else {
