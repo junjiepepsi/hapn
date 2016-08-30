@@ -68,11 +68,11 @@ class Input implements IFilter
         $app->request->cookies = $_COOKIE;
         $app->request->method = $_SERVER['REQUEST_METHOD'];
         if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
-            $app->request->userIp = $_SERVER['HTTP_X_REAL_IP'];
+            $app->request->userip = $_SERVER['HTTP_X_REAL_IP'];
         } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
-            $app->request->userIp = $_SERVER['REMOTE_ADDR'];
+            $app->request->userip = $_SERVER['REMOTE_ADDR'];
         }
-        $app->request->clientIp = $_SERVER['REMOTE_ADDR'];
+        $app->request->clientip = $_SERVER['REMOTE_ADDR'];
 
 
 

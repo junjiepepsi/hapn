@@ -122,13 +122,13 @@ class Request
      *
      * @var string
      */
-    public $clientIp;
+    public $clientip;
     /**
      * The real ip of request user
      *
      * @var
      */
-    public $userIp;
+    public $userip;
 
     /**
      * Server's variables
