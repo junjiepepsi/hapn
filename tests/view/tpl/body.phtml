@@ -1,0 +1,7 @@
+<h3>body</h3>
+<ul>
+    <? foreach ($this->v['list'] as $list):?>
+        <li><a href="<?=$list['url']?>"><?= $list['name'] ?><a/></li>
+    <? endforeach ?>
+</ul>
+<?=$this->partial('partial.phtml')?>

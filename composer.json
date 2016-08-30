@@ -1,0 +1,29 @@
+{
+  "name": "hunbasha/hapn",
+  "description": "php framework",
+  "version": "0.6.8.30",
+  "keywords": [
+    "framework",
+    "php",
+    "hapn"
+  ],
+  "minimum-stability": "stable",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": ">=7.0.0",
+    "ext-mbstring": "*"
+  },
+  "authors": [
+    {
+      "name": "ronnie",
+      "email": "comdeng@live.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "hapn\\": "src/",
+      "hapn\\tests\\": "tests/"
+    }
+  }
+}
