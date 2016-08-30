@@ -12,9 +12,7 @@
   "license": "MIT",
   "require": {
     "php": ">=7.0.0",
-    "ext-mbstring": "*",
-    "squizlabs/php_codesniffer": "^2.6",
-    "phpunit/phpunit": "^5.5"
+    "ext-mbstring": "*"
   },
   "authors": [
     {
@@ -27,5 +25,9 @@
       "hapn\\": "src/",
       "hapn\\tests\\": "tests/"
     }
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^2.6",
+    "phpunit/phpunit": "^5.5"
   }
 }
