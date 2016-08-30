@@ -127,6 +127,11 @@ class ApiProxy
             $conf = self::$configure[$mod];
         }
         if (!$conf) {
+            if (isset(self::$configure['*'])) {
+                $conf = self::$configure['*'];
+            }
+        }
+        if (!$conf) {
             return false;
         }
 
@@ -138,7 +143,7 @@ class ApiProxy
             //模块重命名
             $internalmod = $conf['mod'];
         }
-        $class = $conf['class'];
+        $class = __NAMESPACE__."\\".$conf['class'];
         if (!empty($conf['server'])) {
             $options = $conf['server'];
         } else {
@@ -146,7 +151,6 @@ class ApiProxy
         }
         unset($conf['class'], $conf['server'], $conf['mod']);
         $options = array_merge($options, $conf);
-        require_once dirname(__FILE__) . "/$class.php";
         //为了支持多级模块，/转换成:
         $internalmod = str_replace('/', ':', $internalmod);
         $options['encoding'] = self::$encoding;
@@ -201,6 +205,7 @@ class ApiProxy
 
     /**
      * 添加一个拦截器。类型名称相同的会被覆盖。
+     * @param IInterceptor $intercepter
      * @return void
      */
     public function addInterceptor(IInterceptor $intercepter)
@@ -212,6 +217,7 @@ class ApiProxy
     /**
      * 删除一个拦截器。删除时会根据传入对象的类型名称来判断。
      * 如果类型相同的拦截器会被删除。
+     * @param IInterceptor $intercepter
      * @return void
      */
     public function removeInterceptor(IInterceptor $intercepter)

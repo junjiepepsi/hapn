@@ -2,6 +2,7 @@
 namespace hapn\apiproxy;
 
 use hapn\Exception;
+use hapn\util\Logger;
 
 /**
  *
