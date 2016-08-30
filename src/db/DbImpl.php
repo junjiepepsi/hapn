@@ -412,7 +412,6 @@ class DbImpl
                 return $this->concatSql($sql, $where);
             default:
                 throw new Exception('db.UnknownUpdateMethod');
-
         }
     }
 
@@ -698,7 +697,7 @@ class DbImpl
      * @throws \Exception
      * @throws \hapn\db\Exception
      */
-    function beginTx()
+    public function beginTx()
     {
         $this->dbimpl->beginTx();
     }
@@ -706,7 +705,7 @@ class DbImpl
     /**
      * Commit transaction
      */
-    function commit()
+    public function commit()
     {
         $this->dbimpl->commit();
     }
@@ -992,7 +991,7 @@ class DbImpl
                 ]
             ];
         }
-        $res = $this->_query($sql);
+        $res = $this->query($sql);
         if ($this->followedSql) {
             //保存第二条SQL的结果
             $this->followedResult = $res[1];
@@ -1171,7 +1170,7 @@ class DbImpl
      */
     public function queryBySql($sql)
     {
-        $results = $this->_query(func_get_args());
+        $results = $this->query(func_get_args());
         if (is_array($sql)) {
             //返回一个结果集列表
             return $results;
@@ -1235,7 +1234,7 @@ class DbImpl
         if ($forupdate) {
             $sql .= ' FOR UPDATE';
         }
-        $results = $this->_query($sql);
+        $results = $this->query($sql);
 
         if ($useSqlCals) {
             $this->foundRows = $results[0]['found_rows'];
@@ -1264,7 +1263,7 @@ class DbImpl
         //No need to handle limits
         $this->start = -1;
         $sql = $this->concatSql($sql, $this->buildWhere(true, true));
-        $ret = $this->_query($sql);
+        $ret = $this->query($sql);
         $this->initDbBase();
         return intval($ret[0]['fields'][0]['CNT']);
     }
@@ -1281,7 +1280,7 @@ class DbImpl
         $this->start = 0;
         $this->limit = 1;
         $sql = $this->concatSql($sql, $this->buildWhere(true, true));
-        $ret = $this->_query($sql);
+        $ret = $this->query($sql);
         $this->initDbBase();
         return !empty($ret[0]['fields'][0]);
     }
@@ -1293,7 +1292,7 @@ class DbImpl
      *
      * @return array
      */
-    private function _query($sql)
+    private function query($sql)
     {
         if (DbContext::$longQueryTime == 0) {
             return $this->dbimpl->query($sql);

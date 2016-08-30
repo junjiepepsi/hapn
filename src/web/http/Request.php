@@ -203,7 +203,7 @@ class Request
      * Fetch the $_GET data by key
      *
      * @param  string $key Name of the param
-     * @param null    $default
+     * @param null $default
      *
      * @return mixed|null
      */
@@ -246,7 +246,7 @@ class Request
     public function setData($key, $value = null)
     {
         if (is_array($key)) {
-            foreach($key as $k => $v) {
+            foreach ($key as $k => $v) {
                 $this->userDatas[$k] = $v;
             }
             return;
@@ -259,7 +259,7 @@ class Request
      * Fetch user data by key
      *
      * @param string $key
-     * @param null   $default
+     * @param null $default
      *
      * @return mixed|null
      */

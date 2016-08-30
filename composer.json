@@ -12,7 +12,8 @@
   "license": "MIT",
   "require": {
     "php": ">=7.0.0",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "squizlabs/php_codesniffer": "^2.6"
   },
   "authors": [
     {

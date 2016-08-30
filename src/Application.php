@@ -89,13 +89,13 @@ abstract class Application
      * init
      * @return mixed
      */
-    protected abstract function init();
+    abstract protected function init();
 
     /**
      * process
      * @return mixed
      */
-    protected abstract function process();
+    abstract protected function process();
 
     /**
      * Initialize environment

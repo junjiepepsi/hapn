@@ -32,7 +32,7 @@ class Application extends \hapn\Application
 
     const FILTER_INIT = 'init';
     const FILTER_INPUT = 'input';
-    const FILTER_ROUTER = 'router';
+    const FILTER_URL = 'url';
     const FILTER_OUTPUT = 'output';
     const FILTER_CLEAN = 'clean';
 
@@ -177,7 +177,7 @@ class Application extends \hapn\Application
         foreach ([
                      self::FILTER_INIT,
                      self::FILTER_INPUT,
-                     self::FILTER_ROUTER,
+                     self::FILTER_URL,
                      self::FILTER_OUTPUT
                  ] as $filter) {
             if (false === $this->filter($filter)) {
@@ -199,9 +199,9 @@ class Application extends \hapn\Application
             'hapn.filter.' . self::FILTER_INPUT,
             ["hapn\\web\\filter\\Input"]
         );
-        $filters[self::FILTER_ROUTER] = $this->getFilter(
-            'hapn.filter.' . self::FILTER_ROUTER,
-            ['\\hapn\\web\\filter\\Router'],
+        $filters[self::FILTER_URL] = $this->getFilter(
+            'hapn.filter.' . self::FILTER_URL,
+            ['\\hapn\\web\\filter\\Url'],
             true
         );
         $filters[self::FILTER_OUTPUT] = $this->getFilter(

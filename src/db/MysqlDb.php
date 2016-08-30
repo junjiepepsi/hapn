@@ -48,7 +48,6 @@ class MysqlDb
         $this->dbname = $dbname;
         $this->master = $conf['master'];
         $this->slave = empty($conf['slave']) ? [] : $conf['slave'];
-
     }
 
     /**
@@ -279,7 +278,6 @@ class MysqlDb
         $db = $this->getDbHandle($isRead, crc32($sqls[0]));
         $results = $this->queryResult($db, $sqls, $isMulti);
         return $results;
-
     }
 
     /**
@@ -403,7 +401,6 @@ class MysqlDb
             return true;
         }
         return false;
-
     }
 
     /**

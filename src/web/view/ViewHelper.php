@@ -8,16 +8,15 @@ namespace hapn\web\view;
  * @copyright:  2016 jiehun.com.cn
  * @filesource: ViewHelper.php
  */
-;
 
 abstract class ViewHelper
 {
     /**
-     * @var \firegit\http\View
+     * @var IView
      */
-    var $view;
+    public $view;
 
-    public function __construct($view)
+    public function __construct(IView $view)
     {
         $this->view = $view;
     }

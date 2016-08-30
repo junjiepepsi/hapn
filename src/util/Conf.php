@@ -17,10 +17,13 @@ class Conf
     /**
      * Load the configure files
      *
-     * @param array $paths
+     * @param string|array $paths
      */
-    public static function load(array $paths)
+    public static function load($paths)
     {
+        if (!is_array($paths)) {
+            $paths = [$paths];
+        }
         foreach ($paths as $path) {
             if (isset(self::$isLoaded[$path])) {
                 continue;

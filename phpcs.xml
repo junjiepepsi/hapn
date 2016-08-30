@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<ruleset name="hapn">
+    <description>Php Style Check Standard</description>
+    <encoding>utf-8</encoding>
+
+    <rule ref="Generic.PHP.Syntax"></rule>
+    <rule ref="Squiz.Operators.ValidLogicalOperators"></rule>
+    <rule ref="PSR2"></rule>
+</ruleset>

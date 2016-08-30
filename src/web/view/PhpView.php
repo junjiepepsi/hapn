@@ -4,10 +4,8 @@ namespace hapn\web\view;
 use hapn\Exception;
 use hapn\web\Application;
 
-;
-
 /**
- *
+ * View based on php
  *
  * @author    : ronnie
  * @since     : 2016/7/8 1:54
@@ -146,7 +144,7 @@ class PhpView implements IView
         if (isset($this->helpers[$name])) {
             $helper = $this->helpers[$name];
         } else {
-            $className = $this->app->getNamespace('helper') . '\\'.ucfirst($name);
+            $className = $this->app->getNamespace('helper') . '\\' . ucfirst($name);
             $this->helpers[$name] = $helper = new $className($this);
         }
         return call_user_func_array([$helper, 'execute'], $arguments);
@@ -227,7 +225,7 @@ class PhpView implements IView
             $method = substr($provider, $pos + 2);
             $provider = substr($provider, 0, $pos);
         }
-        $providerKey = $provider.'::'.$method;
+        $providerKey = $provider . '::' . $method;
         if (isset(self::$refMethods[$providerKey])) {
             $refMethod = self::$refMethods[$providerKey];
         } else {
@@ -236,7 +234,7 @@ class PhpView implements IView
         }
         $refParams = $refMethod->getParameters();
         $args = [];
-        foreach($refParams as $param) {
+        foreach ($refParams as $param) {
             $name = $param->getName();
             if (key_exists($name, $params)) {
                 $args[] = $params[$name];

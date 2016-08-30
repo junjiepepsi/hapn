@@ -2,17 +2,15 @@
 namespace hapn\console;
 
 /**
- *
+ * Colored output in console
  * @author:     ronnie
  * @since:      16/8/19 下午11:00
  * @copyright:  2016 jiehun.com.cn
  * @filesource: Color.php
  */
-;
-
 class Color
 {
-    private static $foregroundColors = array(
+    private static $foregroundColors = [
         'black' => '0;30',
         'dark_gray' => '1;30',
         'blue' => '0;34',
@@ -29,8 +27,8 @@ class Color
         'yellow' => '1;33',
         'light_gray' => '0;37',
         'white' => '1;37',
-    );
-    private static $backgroundColors = array(
+    ];
+    private static $backgroundColors = [
         'black' => '40',
         'red' => '41',
         'green' => '42',
@@ -39,7 +37,7 @@ class Color
         'magenta' => '45',
         'cyan' => '46',
         'light_gray' => '47',
-    );
+    ];
 
     /**
      * 获取带颜色的文字
@@ -73,7 +71,7 @@ class Color
      */
     public static function notice(string $msg)
     {
-        echo self::getColoredString($msg, 'light_gray') . PHP_EOL;
+        fwrite(STDOUT, self::getColoredString($msg, 'light_gray') . PHP_EOL);
     }
 
     /**
@@ -82,7 +80,7 @@ class Color
      */
     public static function error(string $msg)
     {
-        echo self::getColoredString($msg, 'red') . PHP_EOL;
+        fwrite(STDERR, self::getColoredString($msg, 'red') . PHP_EOL);
     }
 
     /**
@@ -91,7 +89,7 @@ class Color
      */
     public static function warn(string $msg)
     {
-        echo self::getColoredString($msg, 'yellow') . PHP_EOL;
+        fwrite(STDOUT, self::getColoredString($msg, 'yellow') . PHP_EOL);
     }
 
     /**
@@ -100,6 +98,6 @@ class Color
      */
     public static function success(string $msg)
     {
-        echo self::getColoredString($msg, 'green') . PHP_EOL;
+        fwrite(STDOUT, self::getColoredString($msg, 'green') . PHP_EOL);
     }
 }
