@@ -14,11 +14,17 @@ use hapn\Exception;
 class Logger
 {
     // Log's level type
-    const LOG_LEVEL_FATAL = 'fatal';
-    const LOG_LEVEL_WARN = 'warn';
-    const LOG_LEVEL_NOTICE = 'notice';
-    const LOG_LEVEL_TRACE = 'trace';
     const LOG_LEVEL_DEBUG = 'debug';
+    const LOG_LEVEL_TRACE = 'trace';
+    const LOG_LEVEL_NOTICE = 'notice';
+    const LOG_LEVEL_WARN = 'warn';
+    const LOG_LEVEL_FATAL = 'fatal';
+
+    const INT_LOG_LEVEL_DEBUG = 0x1;
+    const INT_LOG_LEVEL_TRACE = 0x2;
+    const INT_LOG_LEVEL_NOTICE = 0x4;
+    const INT_LOG_LEVEL_WARN = 0x8;
+    const INT_LOG_LEVEL_FATAL = 0x10;
 
     // Log's rolling type
     const NONE_ROLLING = 0;
@@ -33,11 +39,11 @@ class Logger
     const BUFFER_SIZE = 4096;
 
     private static $logLevels = array(
-        self::LOG_LEVEL_DEBUG => 0x1,
-        self::LOG_LEVEL_TRACE => 0x2,
-        self::LOG_LEVEL_NOTICE => 0x4,
-        self::LOG_LEVEL_WARN => 0x8,
-        self::LOG_LEVEL_FATAL => 0x10,
+        self::LOG_LEVEL_DEBUG => self::INT_LOG_LEVEL_DEBUG,
+        self::LOG_LEVEL_TRACE => self::INT_LOG_LEVEL_TRACE,
+        self::LOG_LEVEL_NOTICE => self::INT_LOG_LEVEL_NOTICE,
+        self::LOG_LEVEL_WARN => self::INT_LOG_LEVEL_WARN,
+        self::LOG_LEVEL_FATAL => self::INT_LOG_LEVEL_FATAL,
     );
 
     private static $basics = array();
@@ -50,9 +56,14 @@ class Logger
     /**
      * @param string $dir
      * @param string $file
-     * @param array  $info
-     * @param string $level
-     * @param int    $rollType
+     * @param array $info
+     * @param int $level
+     * 0x1:debug
+     * 0x2:trace
+     * 0x4:notice
+     * 0x8:warn
+     * 0x10:fatal
+     * @param int $rollType
      *
      * @throws Exception logger.dirnotwritable
      */
@@ -60,7 +71,7 @@ class Logger
         string $dir,
         string $file,
         array $info = [],
-        string $level = self::LOG_LEVEL_DEBUG,
+        int $level = self::LOG_LEVEL_DEBUG,
         int $rollType = self::NONE_ROLLING
     ) {
         if (!is_writable($dir)) {
@@ -163,7 +174,7 @@ class Logger
      * 添加基本变量
      *
      * @param string|array $key
-     * @param string       $value
+     * @param string $value
      */
     public static function addBasic($key, $value = null)
     {
@@ -182,7 +193,7 @@ class Logger
      *
      * @param string $level
      * @param string $msg
-     * @param array  ...$args
+     * @param array ...$args
      */
     public static function log(string $level, string $msg, ...$args)
     {
@@ -192,9 +203,8 @@ class Logger
         if (!isset(self::$logLevels[$level])) {
             return;
         }
-
         $intLevel = self::$logLevels[$level];
-        if ($intLevel > self::$level) {
+        if ($intLevel < self::$level) {
             return;
         }
 
@@ -203,11 +213,13 @@ class Logger
         $ms = floor($micro * 1000000);
 
         $bt = debug_backtrace();
-        if (isset($bt [1]) && isset($bt [1] ['file'])) {
+        if (isset($bt [1]) && isset($bt[1]['file']) && (!isset($bt[1]['function']) || $bt[1]['function'] != 'call_user_func_array')) {
             $c = $bt [1];
-        } elseif (isset($bt [2]) && isset($bt [2] ['file'])) {
+        } elseif (isset($bt[2]) && isset($bt[2]['file'])) {
             $c = $bt [2];
-        } elseif (isset($bt [0]) && isset($bt [0] ['file'])) {
+        } elseif (isset($bt[3]) && isset($bt[3]['file'])) {
+            $c = $bt [3];
+        } elseif (isset($bt[0]) && isset($bt[0]['file'])) {
             $c = $bt [0];
         } else {
             $c = [
@@ -219,7 +231,7 @@ class Logger
         $prefix = sprintf(
             '%s:%s.%-06d*%d%s',
             $level,
-            date('YmdHis', $sec),
+            date('Y/m/d H:i:s', $sec),
             $ms,
             posix_getpid(),
             $line_no
@@ -238,9 +250,9 @@ class Logger
     /**
      * Write log
      *
-     * @param int    $level
+     * @param int $level
      * @param string $msg
-     * @param bool   $forceWrite
+     * @param bool $forceWrite
      */
     private static function writeLog(int $level, string $msg, bool $forceWrite = false)
     {
@@ -253,9 +265,9 @@ class Logger
 
     /**
      * Writer log
-     * @param array  $log
+     * @param array $log
      * @param string $msg
-     * @param bool   $forceWrite
+     * @param bool $forceWrite
      */
     private static function innerWriteLog(array &$log, string $msg, bool $forceWrite)
     {

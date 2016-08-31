@@ -148,11 +148,11 @@ abstract class Application
      */
     public function initLog()
     {
-        $logFile = Conf::get('hapn.log.file', 'hapn');
-        $logLevel = Conf::get('hapn.log.level', $this->debug ? Logger::LOG_LEVEL_DEBUG : Logger::LOG_LEVEL_TRACE);
+        $logFile = Conf::get('hapn.log.file', 'HapN');
+        $logLevel = Conf::get('hapn.log.level', $this->debug ? Logger::INT_LOG_LEVEL_DEBUG : Logger::INT_LOG_LEVEL_TRACE);
         if ($this->debug === true) {
             // set log level as debug if in debug mode
-            $logLevel = Logger::LOG_LEVEL_DEBUG;
+            $logLevel = Logger::INT_LOG_LEVEL_DEBUG;
         }
         $roll = Conf::get('hapn.log.roll', Logger::NONE_ROLLING);
         Logger::init(defined('LOG_ROOT') ? LOG_ROOT : $this->getDir('log'), $logFile, array(), $logLevel, $roll);
