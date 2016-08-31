@@ -20,11 +20,11 @@ class Logger
     const LOG_LEVEL_WARN = 'warn';
     const LOG_LEVEL_FATAL = 'fatal';
 
-    const INT_LOG_LEVEL_DEBUG = 0x1;
-    const INT_LOG_LEVEL_TRACE = 0x2;
+    const INT_LOG_LEVEL_DEBUG = 0x10;
+    const INT_LOG_LEVEL_TRACE = 0x8;
     const INT_LOG_LEVEL_NOTICE = 0x4;
-    const INT_LOG_LEVEL_WARN = 0x8;
-    const INT_LOG_LEVEL_FATAL = 0x10;
+    const INT_LOG_LEVEL_WARN = 0x2;
+    const INT_LOG_LEVEL_FATAL = 0x1;
 
     // Log's rolling type
     const NONE_ROLLING = 0;
@@ -204,10 +204,9 @@ class Logger
             return;
         }
         $intLevel = self::$logLevels[$level];
-        if ($intLevel < self::$level) {
+        if ($intLevel > self::$level) {
             return;
         }
-
         $micro = microtime();
         $sec = intval(substr($micro, strpos($micro, " ")));
         $ms = floor($micro * 1000000);
@@ -256,7 +255,7 @@ class Logger
      */
     private static function writeLog(int $level, string $msg, bool $forceWrite = false)
     {
-        if ($level < self::$logLevels[self::LOG_LEVEL_WARN]) {
+        if ($level > self::$logLevels[self::LOG_LEVEL_WARN]) {
             self::innerWriteLog(self::$logs[self::LOG_TYPE_NORMAL], $msg, $forceWrite);
         } else {
             self::innerWriteLog(self::$logs[self::LOG_TYPE_CRITICAL], $msg, $forceWrite);
