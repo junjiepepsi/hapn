@@ -23,7 +23,7 @@ class Output implements IFilter
      */
     public function execute(Application $app)
     {
-        $to = $app->request->outputEncoding;
+        $to = $app->request->oe;
         if ($app->encoding !== $to) {
             $app->response->outputs = $this->transEncoding($app->response->outputs, $to, $app->encoding);
             $app->response->headers = $this->transEncoding($app->response->headers, $to, $app->encoding);

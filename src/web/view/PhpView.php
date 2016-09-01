@@ -263,6 +263,6 @@ class PhpView implements IView
      */
     public function datas()
     {
-        return $this->app->request->userDatas;
+        return $this->app->request->userData;
     }
 }

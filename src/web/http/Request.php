@@ -40,28 +40,28 @@ class Request
      *
      * @var string
      */
-    public $outputFormat = Application::FORMAT_DEFAULT;
+    public $of = Application::FORMAT_DEFAULT;
 
     /**
      * The encoding of response's body
      *
      * @var string
      */
-    public $outputEncoding = Application::ENCODING_UTF8;
+    public $oe = Application::ENCODING_UTF8;
 
     /**
      * The format of requrest's body
      *
      * @var string
      */
-    public $inputFormat;
+    public $if;
 
     /**
      * The encoding of requrest's body
      *
      * @var string
      */
-    public $inputEncoding = Application::ENCODING_UTF8;
+    public $ie = Application::ENCODING_UTF8;
 
     /**
      * Whether output the pretty data
@@ -149,7 +149,7 @@ class Request
      *
      * @var array
      */
-    public $userDatas = [];
+    public $userData = [];
 
     /**
      * Application's Request ID
@@ -247,11 +247,11 @@ class Request
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
-                $this->userDatas[$k] = $v;
+                $this->userData[$k] = $v;
             }
             return;
         }
-        $this->userDatas[$key] = $value;
+        $this->userData[$key] = $value;
         return $this;
     }
 
@@ -265,8 +265,8 @@ class Request
      */
     public function getData(string $key, $default = null)
     {
-        if (isset($this->userDatas[$key])) {
-            return $this->userDatas[$key];
+        if (isset($this->userData[$key])) {
+            return $this->userData[$key];
         }
         return $default;
     }
@@ -300,7 +300,7 @@ class Request
             return true;
         }
         if ($this->method === self::METHOD_GET &&
-            ($this->outputFormat == Application::FORMAT_HTML || $this->outputFormat == Application::FORMAT_DEFAULT)
+            ($this->of == Application::FORMAT_HTML || $this->of == Application::FORMAT_DEFAULT)
         ) {
             return true;
         }

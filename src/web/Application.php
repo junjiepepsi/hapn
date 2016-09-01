@@ -397,7 +397,7 @@ class Application extends \hapn\Application
                             $this->setHeader('HTTP/1.1 500 Internal Server Error');
                             break;
                     }
-                    $this->request->userDatas = [];
+                    $this->request->userData = [];
                     $response->outputs = [];
                     $response->sets(
                         [

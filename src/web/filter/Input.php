@@ -74,9 +74,6 @@ class Input implements IFilter
         }
         $app->request->clientip = $_SERVER['REMOTE_ADDR'];
 
-
-
-
         if (isset($_GET['route'])) {
             $app->request->url = $_GET['route'];
         } elseif (isset($_SERVER['REQUEST_URI'])) {
@@ -111,16 +108,16 @@ class Input implements IFilter
         $arr = array_merge($_REQUEST, $_GET, $_POST);
         $app->request->pretty = empty($arr['_pretty']) ? false : true;
         if (!empty($arr['_if'])) {
-            $app->request->inputFormat = $arr['_if'];
+            $app->request->if = $arr['_if'];
         }
         if (!empty($arr['_ie'])) {
-            $app->request->inputFormat = $arr['_ie'];
+            $app->request->if = $arr['_ie'];
         } else {
-            $app->request->inputEncoding = Conf::get('hapn.inputEncoding', $app->encoding);
+            $app->request->ie = Conf::get('hapn.inputEncoding', $app->encoding);
         }
 
         if (!empty($arr['_of'])) {
-            $app->request->outputFormat = $arr['_of'];
+            $app->request->of = $arr['_of'];
         } else {
             $method = $app->request->method;
             if (in_array(
@@ -132,24 +129,24 @@ class Input implements IFilter
                 )
             )) {
                 // 非GET请求默认都按照JSON返回了
-                $app->request->outputFormat = Application::FORMAT_JSON;
+                $app->request->of = Application::FORMAT_JSON;
             } else {
-                $app->request->outputFormat = Application::FORMAT_DEFAULT;
+                $app->request->of = Application::FORMAT_DEFAULT;
             }
         }
         if (!empty($arr['_oe'])) {
-            $app->request->outputEncoding = $arr['_oe'];
+            $app->request->oe = $arr['_oe'];
         } else {
-            $app->request->outputEncoding = Conf::get('hapn.outputEncoding', $app->encoding);
+            $app->request->oe = Conf::get('hapn.outputEncoding', $app->encoding);
         }
-        if ($app->request->outputFormat === Application::FORMAT_JSON) {
+        if ($app->request->of === Application::FORMAT_JSON) {
             // JSON只能UTF-8
-            $app->request->outputEncoding = 'UTF-8';
+            $app->request->oe = 'UTF-8';
         }
 
         // 全变成大写，方便内部判断
-        $app->request->inputEncoding = strtoupper($app->request->inputEncoding);
-        $app->request->outputEncoding = strtoupper($app->request->outputEncoding);
+        $app->request->ie = strtoupper($app->request->ie);
+        $app->request->oe = strtoupper($app->request->oe);
     }
 
     /**
@@ -173,7 +170,7 @@ class Input implements IFilter
 
         $puts = file_get_contents('php://input');
         if ($puts) {
-            if (Application::FORMAT_JSON === $app->request->inputFormat) {
+            if (Application::FORMAT_JSON === $app->request->if) {
                 $json = json_decode($puts, true);
                 $arr = $arr ? array_merge($arr, $json) : $json;
             }
@@ -188,7 +185,7 @@ class Input implements IFilter
      */
     private function transEncoding(Application $app)
     {
-        $ie = $app->request->inputEncoding;
+        $ie = $app->request->ie;
         $to = $app->encoding;
         if ($ie === $to) {
             return;

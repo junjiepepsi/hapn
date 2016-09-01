@@ -139,8 +139,8 @@ class Response
         $this->callback = $funcName;
 
         // Change the encoding and format
-        $this->app->request->outputFormat = Application::FORMAT_JSON;
-        $this->app->request->outputEncoding = Application::ENCODING_UTF8;
+        $this->app->request->of = Application::FORMAT_JSON;
+        $this->app->request->oe = Application::ENCODING_UTF8;
         return $this;
     }
 
@@ -155,7 +155,7 @@ class Response
     public function setView(string $tpl) : Response
     {
         $this->template = $this->app->getDir('view') . '/' . ltrim($tpl, '/');
-        $this->app->request->outputFormat = Application::FORMAT_HTML;
+        $this->app->request->of = Application::FORMAT_HTML;
         return $this;
     }
 
@@ -502,8 +502,8 @@ class Response
     protected function formatResponse()
     {
         $result = $this->getResult();
-        $of = $this->app->request->outputFormat;
-        $this->buildContentType($of, $this->app->request->outputEncoding);
+        $of = $this->app->request->of;
+        $this->buildContentType($of, $this->app->request->oe);
         if (!is_null($this->raw)) {
             return $this->raw;
         } elseif ($this->template) {
@@ -521,7 +521,7 @@ class Response
                     return json_encode($result, $options);
                 }
             } elseif ($of == Application::FORMAT_XML) {
-                return Xml::array2Xml($result, $this->app->request->outputEncoding);
+                return Xml::array2Xml($result, $this->app->request->oe);
             } else {
                 return print_r($result, true);
             }
