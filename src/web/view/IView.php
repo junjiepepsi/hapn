@@ -15,17 +15,16 @@ interface IView
 {
     /**
      * Init View
-     *
-     * @param Application $app
+     * @param array $conf
      *
      * @return mixed
      */
-    public function init(Application $app);
+    public function init(array $conf = []);
 
     /**
      * Set variable for template
      *
-     * @param string $name  Name of the variable
+     * @param string $name Name of the variable
      * @param  mixed $value Value of the variable
      *
      * @return mixed
@@ -79,7 +78,7 @@ interface IView
      * Contain a child template
      *
      * @param string $tpl
-     * @param array  $vars
+     * @param array $vars
      *
      * @return string
      */

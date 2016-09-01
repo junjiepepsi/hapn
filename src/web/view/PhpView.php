@@ -17,11 +17,9 @@ class PhpView implements IView
     public $v = [];
     private $layout;
     private $tpl;
+    private $tplDir = '';
+    private $helperNs = '';
     private $helpers = [];
-    /**
-     * @var Application
-     */
-    public $app;
 
     /**
      * ReflectionMethods of providers
@@ -30,15 +28,28 @@ class PhpView implements IView
     private static $refMethods = [];
 
     /**
-     * Init View
-     *
-     * @param Application $app
-     *
-     * @return mixed
+     * Global static variables
+     * @var array
      */
-    public function init(Application $app)
+    private static $globals = [];
+    const GLOBAL_KEY = '__GLOBAL__';
+
+    /**
+     * Init View
+     * @param array $conf
+     *
+     * @see IView::init
+     * @return mixed|void
+     */
+    public function init(array $conf = [])
     {
-        $this->app = $app;
+        if (isset($conf['tplDir'])) {
+            $this->tplDir = $conf['tplDir'];
+        }
+
+        if (isset($conf['helperNs'])) {
+            $this->helperNs = $conf['helperNs'];
+        }
     }
 
     /**
@@ -51,6 +62,11 @@ class PhpView implements IView
      */
     public function set(string $name, $value)
     {
+        if ($name == self::GLOBAL_KEY) {
+            self::$globals = $value;
+            return;
+        }
+
         $this->v[$name] = $value;
     }
 
@@ -63,6 +79,11 @@ class PhpView implements IView
      */
     public function setArray(array $vars)
     {
+        if (isset($vars[self::GLOBAL_KEY])) {
+            self::$globals = $vars[self::GLOBAL_KEY];
+            unset($vars[self::GLOBAL_KEY]);
+        }
+
         foreach ($vars as $k => $v) {
             $this->v[$k] = $v;
         }
@@ -144,7 +165,7 @@ class PhpView implements IView
         if (isset($this->helpers[$name])) {
             $helper = $this->helpers[$name];
         } else {
-            $className = $this->app->getNamespace('helper') . '\\' . ucfirst($name);
+            $className = $this->helperNs . '\\' . ucfirst($name);
             $this->helpers[$name] = $helper = new $className($this);
         }
         return call_user_func_array([$helper, 'execute'], $arguments);
@@ -160,14 +181,12 @@ class PhpView implements IView
      */
     public function partial(string $tpl, array $vars = [])
     {
-        if ($tpl[0] == '/') {
-            $tpl = $this->app->getDir('view') . $tpl;
-        } else {
-            $dir = dirname($this->tpl);
-            $tpl = $dir . '/' . $tpl;
-        }
+        $tpl = rtrim($this->tplDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $tpl;
         $view = new PhpView();
-        $view->init($this->app);
+        $view->init([
+            'tplDir' => $this->tplDir,
+            'helperNs' => $this->helperNs,
+        ]);
         $view->setArray($vars);
         return $view->build($tpl);
     }
@@ -193,7 +212,7 @@ class PhpView implements IView
     public function provider(string $provider, $params = [], $keyMap = [])
     {
         if ($provider[0] != "\\") {
-            $provider = $this->app->getNamespace('provider') . "\\" . $provider;
+            $provider = rtrim($this->helperNs . "\\", "\\") . $provider;
         }
         $ret = self::invokeProvider($provider, $params);
         if (!$keyMap) {
@@ -248,21 +267,21 @@ class PhpView implements IView
     }
 
     /**
-     * Fetch data
+     * Fetch global variable
      * @param string $key
      * @param mixed $def
      * @return mixed
      */
     public function data(string $key, $def = null)
     {
-        return $this->app->request->getData($key, $def);
+        return self::$globals[$key] ?? $def;
     }
 
     /**
-     * Fetch all userDatas in app->request
+     * Fetch all global variables
      */
     public function datas()
     {
-        return $this->app->request->userData;
+        return self::$globals;
     }
 }

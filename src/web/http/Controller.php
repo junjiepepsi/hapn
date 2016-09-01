@@ -118,6 +118,7 @@ class Controller
      * @param \string[] ...$vars
      *
      * @see Response::sets
+     * @return $this
      */
     public function sets($vars)
     {

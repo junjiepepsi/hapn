@@ -7,10 +7,8 @@ use hapn\Exception;
 use hapn\util\Conf;
 use hapn\util\Logger;
 use hapn\web\filter\Executor;
-use hapn\web\http\Controller;
 use hapn\web\http\Request;
 use hapn\web\http\Response;
-use hapn\web\view\PhpView;
 
 /**
  * Application of web request

@@ -7,6 +7,7 @@ use hapn\util\Xml;
 use hapn\web\Application;
 use hapn\Exception;
 use hapn\web\view\IView;
+use hapn\web\view\PhpView;
 
 /**
  * 响应类
@@ -454,7 +455,10 @@ class Response
         if (!($view instanceof IView)) {
             throw new Exception('view.notImplementOfIview');
         }
-        $view->init($this->app);
+        $view->init([
+            'tplDir' => $this->app->getDir('view'),
+            'helperNs' => $this->app->getNamespace('helper'),
+        ]);
         $view->setArray($userData);
         if (!$output) {
             $this->app->timer->begin($engineName);
@@ -468,6 +472,10 @@ class Response
             } else {
                 $view->setLayout($this->layouts);
             }
+        }
+        // Set global variables with request->userData
+        if ($view instanceof PhpView) {
+            $view->set(PhpView::GLOBAL_KEY, $this->app->request->userData);
         }
         $this->app->timer->begin($engineName);
         $view->display($template);
