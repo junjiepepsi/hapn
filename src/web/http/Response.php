@@ -41,7 +41,7 @@ class Response
      * @var string
      */
     private $template;
-    private $layout;
+    private $layouts = [];
     private $raw;
     /**
      * @var Exception
@@ -66,6 +66,25 @@ class Response
     public function __construct(Application $app)
     {
         $this->app = $app;
+    }
+
+    /**
+     * Reset
+     */
+    public function reset()
+    {
+        $this->headers = [];
+        $this->cookies = [];
+        $this->exception = null;
+        $this->error = null;
+        $this->needSetContentType = true;
+        $this->template = '';
+        $this->layouts = [];
+        $this->tasks = [];
+        $this->raw = null;
+        $this->callback = null;
+        $this->outputs = [];
+        $this->results = [];
     }
 
     /**
@@ -197,9 +216,9 @@ class Response
             foreach ($layout as $k => $v) {
                 $layout[$k] = $this->app->getDir('view') . '/' . ltrim($v, '/');
             }
-            $this->layout = $layout;
+            $this->layouts = $layout;
         } else {
-            $this->layout = $this->app->getDir('view') . '/' . ltrim($layout, '/');
+            $this->layouts = [$this->app->getDir('view') . '/' . ltrim($layout, '/')];
         }
         return $this;
     }
@@ -443,11 +462,11 @@ class Response
             $this->app->timer->end($engineName);
             return $result;
         }
-        if ($this->layout) {
-            if (is_array($this->layout)) {
-                call_user_func_array(array($view, 'setLayout'), $this->layout);
+        if ($this->layouts) {
+            if (is_array($this->layouts)) {
+                call_user_func_array(array($view, 'setLayout'), $this->layouts);
             } else {
-                $view->setLayout($this->layout);
+                $view->setLayout($this->layouts);
             }
         }
         $this->app->timer->begin($engineName);

@@ -200,6 +200,18 @@ class Request
     }
 
     /**
+     * Reset
+     */
+    public function reset()
+    {
+        $this->app = null;
+        $this->inputs = [];
+        $this->userData = [];
+        $this->cookies = [];
+        $this->pretty = false;
+    }
+
+    /**
      * Fetch the $_GET data by key
      *
      * @param  string $key Name of the param

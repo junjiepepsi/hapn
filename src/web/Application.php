@@ -5,7 +5,9 @@ namespace hapn\web;
 use hapn\apiproxy\ApiProxy;
 use hapn\Exception;
 use hapn\util\Conf;
+use hapn\util\Logger;
 use hapn\web\filter\Executor;
+use hapn\web\http\Controller;
 use hapn\web\http\Request;
 use hapn\web\http\Response;
 use hapn\web\view\PhpView;
@@ -331,6 +333,12 @@ class Application extends \hapn\Application
         if (false === parent::errorHandler($error[0], $error[1], $error[2], $error[3])) {
             return;
         }
+
+        // 清理掉所有的输出
+        while (ob_get_clean()) {
+            //
+        }
+        ob_start();
         if (true === $this->debug) {
             unset($error[4]);
             echo "<pre>";
@@ -340,7 +348,6 @@ class Application extends \hapn\Application
         $errcode = Exception::EXCEPTION_FATAL;
         $this->endStatus = $errcode;
         $this->response->setFrHeader($errcode);
-
         $this->setHeader($errcode);
         if ($this->request->needErrorPage()) {
             $this->goErrorPage($errcode);
@@ -377,42 +384,29 @@ class Application extends \hapn\Application
             }
             $url = str_replace('[url]', urlencode($domain . $this->request->rawUri), $url);
         }
+
         if (true === $this->debug) {
             $this->response->sendHeaders();
-            echo "<br/>Redirect: <a href='$url'>$url</a><br/>";
-        } else {
-            // 清理掉所有的输出
-            while (ob_get_clean()) {
-                //
+            if ($url && $url[0] = '!') {
+                $url = substr($url, 1);
             }
-
+            if ($url) {
+                echo "<br/>Redirect: <a href='$url'>$url</a><br/>";
+            }
+        } else {
             if ($url) {
                 if ($url[0] == '!') {
-                    $response = new Response($this);
-                    switch ($errcode) {
-                        case Exception::EXCEPTION_NOT_FOUND:
-                            $response->setHeader('HTTP/1.1 404 Not Found');
-                            break;
-                        case Exception::EXCEPTION_NO_POWER:
-                            $response->setHeader('HTTP/1.1 401 Unauthorized');
-                            break;
-                        case Exception::EXCEPTION_FATAL:
-                            $this->setHeader('HTTP/1.1 500 Internal Server Error');
-                            break;
+                    $url = substr($url, 1);
+                    try {
+                        $this->showInnerPage($url, $errcode);
+                        exit();
+                    } catch (\Exception $ex) {
+                        echo $ex->getMessage();
+                        echo '<pre>'.$ex->getTraceAsString().'</pre>';
+                        Logger::fatal($ex->getTraceAsString());
+                        exit();
                     }
-                    $this->request->userData = [];
-                    $response->outputs = [];
-                    $response->sets(
-                        [
-                            'rawUri' => $this->request->rawUri,
-                            'code' => $errcode,
-                        ]
-                    );
-                    $response->setView(substr($url, 1) . '.phtml');
-                    $response->send();
-                    exit();
                 }
-
 
                 $metaUrl = "<meta http-equiv=\"refresh\" content=\"0; url={$url}\"/>";
                 $redirectDesc = "Redirect to:{$url}";
@@ -438,6 +432,54 @@ class Application extends \hapn\Application
 HTML;
             exit();
         }
+    }
+
+    /**
+     * Display inner page
+     * @param string $url
+     * @param string $errcode
+     * @throws \Exception
+     */
+    private function showInnerPage($url, $errcode)
+    {
+        $arr = explode('/', trim($url, '/'));
+        $method = array_pop($arr);
+        $clsName = trim($this->getNamespace('controller') . "\\" . implode("\\", $arr), "\\") . "\\Controller";
+        $ctl = new $clsName();
+        $func = $method.Conf::get('hapn.methodExt', '');
+        if (!method_exists($ctl, $func)) {
+            throw new \Exception('app.funcNotFound func:' . $func);
+        }
+        $this->response->reset();
+        $ctl->response = $this->response;
+        $ctl->request = $this->request;
+        switch ($errcode) {
+            case Exception::EXCEPTION_NOT_FOUND:
+                $ctl->response->setHeader('HTTP/1.1 404 Not Found');
+                break;
+            case Exception::EXCEPTION_NO_POWER:
+                $ctl->response->setHeader('HTTP/1.1 401 Unauthorized');
+                break;
+            case Exception::EXCEPTION_FATAL:
+                $ctl->response->setHeader('HTTP/1.1 500 Internal Server Error');
+                break;
+        }
+        $ctl->sets(
+            [
+                'rawUri' => $this->request->rawUri,
+                'code' => $errcode,
+            ]
+        );
+        $ctl->path = implode('/', $arr);
+        $ctl->method = $method;
+        if (method_exists($ctl, '_before')) {
+            call_user_func(array($ctl, '_before'));
+        }
+        call_user_func(array($ctl, $func));
+        if (method_exists($ctl, '_after')) {
+            call_user_func(array($ctl, '_after'));
+        }
+        $ctl->response->send();
     }
 
     protected function setHeader($errcode)
@@ -479,9 +521,16 @@ HTML;
     public function exceptionHandler($ex)
     {
         parent::exceptionHandler($ex);
+        // 清理掉所有的输出
+        while (ob_get_clean()) {
+            //
+        }
+        ob_start();
+
         if (true === $this->debug) {
             echo "<pre>";
-            print_r($ex->__toString());
+            echo "<h1>{$ex->getMessage()}</h1>";
+            print_r($ex->getTraceAsString());
             echo "</pre>";
         }
 
@@ -489,6 +538,7 @@ HTML;
         if ($ex instanceof Exception && ($pos = strpos($errcode, ' '))) {
             $errcode = substr($errcode, 0, $pos);
         }
+
         if ($this->request->method == 'GET') {
             $retrycode = Conf::get('hapn.error.retrycode', '/\.net_/');
             $retrynum = $this->request->get('_retry', 0);
