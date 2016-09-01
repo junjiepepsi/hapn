@@ -431,7 +431,6 @@ class Response
     {
         $engine = Conf::get('hapn.view', "\\hapn\\web\\view\\PhpView");
         $engineName = substr($engine, strripos($engine, "\\") + 1);
-        $this->app->timer->begin($engineName);
         $view = new $engine();
         if (!($view instanceof IView)) {
             throw new Exception('view.notImplementOfIview');
@@ -439,8 +438,9 @@ class Response
         $view->init($this->app);
         $view->setArray($userData);
         if (!$output) {
+            $this->app->timer->begin($engineName);
             $result = $view->build($template);
-            $this->app->timer->end($engine);
+            $this->app->timer->end($engineName);
             return $result;
         }
         if ($this->layout) {
@@ -450,7 +450,9 @@ class Response
                 $view->setLayout($this->layout);
             }
         }
+        $this->app->timer->begin($engineName);
         $view->display($template);
+        $this->app->timer->end($engineName);
         return null;
     }
 

@@ -381,7 +381,10 @@ class Application extends \hapn\Application
             $this->response->sendHeaders();
             echo "<br/>Redirect: <a href='$url'>$url</a><br/>";
         } else {
-            ob_clean();
+            // 清理掉所有的输出
+            while (ob_get_clean()) {
+                //
+            }
 
             if ($url) {
                 if ($url[0] == '!') {
