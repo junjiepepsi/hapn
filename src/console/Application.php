@@ -17,6 +17,7 @@ class Application extends \hapn\Application
 {
 
     private $opts = [];
+    private $args = [];
 
     /**
      * Initial
@@ -70,6 +71,7 @@ class Application extends \hapn\Application
                 }
             }
         }
+        $this->args = $args;
     }
 
     public function exceptionHandler($ex)
@@ -102,8 +104,8 @@ class Application extends \hapn\Application
         $_opts = array();
         foreach ($params as $param) {
             $name = $param->getName();
-            if (isset($args[$name])) {
-                $_opts[] = $args[$name];
+            if (isset($this->args[$name])) {
+                $_opts[] = $this->args[$name];
             } else {
                 $_opts[] = null;
             }
