@@ -212,7 +212,7 @@ abstract class Application
                 $error[2],
                 $error[3]
             );
-            set_error_handler(array($this, 'errorHandler'));
+            set_error_handler([$this, 'errorHandler']);
             return false;
         }
 

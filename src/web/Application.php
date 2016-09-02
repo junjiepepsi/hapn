@@ -353,7 +353,7 @@ class Application extends \hapn\Application
             $this->response->setError($error);
             $this->response->send();
         }
-        exit();
+        exit(8);
     }
 
     /**
@@ -428,7 +428,6 @@ class Application extends \hapn\Application
 </body>
 </html>
 HTML;
-            exit();
         }
     }
 
@@ -552,7 +551,7 @@ HTML;
                 $url = $this->request->url . '?' . http_build_query($gets);
                 $this->response->setHeader('X-Rewrite-URI: ' . $url);
                 $this->response->send();
-                exit();
+                exit(4);
             }
         }
         $this->response->setFrHeader($errcode);
@@ -560,10 +559,10 @@ HTML;
 
         if ($this->request->needErrorPage()) {
             $this->goErrorPage($errcode);
-            exit();
+            exit(4);
         }
         $this->response->setException($ex);
         $this->response->send();
-        exit();
+        exit(4);
     }
 }

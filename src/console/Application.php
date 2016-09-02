@@ -1,7 +1,7 @@
 <?php
 namespace hapn\console;
 
-use hapn\db\Db;
+use hapn\Exception;
 use hapn\util\Conf;
 use hapn\util\Logger;
 
@@ -30,7 +30,9 @@ class Application extends \hapn\Application
         $this->initAppEnv();
         $this->initConf();
 
-        if ($this->debug !== true && isset($this->opts['D']) || isset($this->opts['debug'])) {
+        if ($this->debug !== true &&
+            (isset($this->opts['D']) || isset($this->opts['debug']))
+        ) {
             $this->debug = true;
         }
 
@@ -74,17 +76,41 @@ class Application extends \hapn\Application
         $this->args = $args;
     }
 
+    /**
+     * @see parent::errorHandler
+     */
+    public function errorHandler()
+    {
+        $error = func_get_args();
+        if (false === parent::errorHandler($error[0], $error[1], $error[2], $error[3])) {
+            return;
+        }
+        if (true === $this->debug) {
+            unset($error[4]);
+            fwrite(STDERR, PHP_EOL . 'error found:' . PHP_EOL);
+            fwrite(STDERR, "appId:" . $this->appId . PHP_EOL);
+            fwrite(STDERR, "detail:" . print_r($error, true) . PHP_EOL);
+        }
+        exit(8);
+    }
+
+    /**
+     * @param Exception $ex
+     * @see parent::exceptionHandler
+     */
     public function exceptionHandler($ex)
     {
         parent::exceptionHandler($ex);
 
-        echo "error:".$ex->getMessage().PHP_EOL;
+        fwrite(STDERR, 'exception found:'.PHP_EOL);
+        fwrite(STDERR, "appId:".$this->appId.PHP_EOL);
+        fwrite(STDERR, "msg:".$ex->getMessage() . PHP_EOL);
         if ($this->debug) {
-            echo "trace:".PHP_EOL;
-            echo $ex->getTraceAsString();
+            fwrite(STDERR, "trace:" . PHP_EOL);
+            fwrite(STDERR, $ex->getTraceAsString().PHP_EOL);
         }
         echo PHP_EOL;
-        exit(1);
+        exit(4);
     }
 
     /**
@@ -107,17 +133,15 @@ class Application extends \hapn\Application
             if (isset($this->args[$name])) {
                 $_opts[] = $this->args[$name];
             } else {
-                $_opts[] = null;
+                if ($param->isDefaultValueAvailable()) {
+                    $_opts[] = $param->getDefaultValue();
+                } else {
+                    throw new Exception('console.argNotDefined arg=' . $name);
+                }
             }
         }
 
-        try {
-            call_user_func_array(array($cls, 'execute'), $_opts);
-        } catch (Exception $ex) {
-            Logger::fatal($ex->getMessage());
-            $this->endStatus = self::ENDSTATUS_ERROR;
-            exit(2);
-        }
+        call_user_func_array(array($cls, 'execute'), $_opts);
     }
 
 
@@ -155,6 +179,8 @@ Usage:
 ./Run -c "\\hapn\\tool\\Foo" -d a=b -d foo=bar
   -c 调用的tool类，该类必须具有execute方法，会将-d传入的参数匹配到方法的参数
   -d 传入的参数，以key=value的形式设置
+  -D --debug 开启调试
+  -h 显示此帮助文档
  
 Tool Code:
 # vi app/tool/Foo.php

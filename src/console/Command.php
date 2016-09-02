@@ -176,6 +176,7 @@ class Command
                 } else {
                     $line = fgets($pipes[1], 1024);
                     if ($line !== false) {
+                        $line = trim($line, PHP_EOL);
                         $this->outputs[] = $line;
                         if ($this->outputCallback) {
                             call_user_func($this->outputCallback, $line);
@@ -191,6 +192,7 @@ class Command
                 } else {
                     $line = fgets($pipes[2], 1024);
                     if ($line !== false) {
+                        $line = trim($line, PHP_EOL);
                         $this->errors[] = $line;
                         if ($this->errorCallback) {
                             call_user_func($this->errorCallback, $line);
@@ -215,7 +217,7 @@ class Command
     public static function run($cmd, ...$args)
     {
         $command = (new \ReflectionClass(__CLASS__))
-            ->newInstance(func_get_args());
+            ->newInstanceArgs(func_get_args());
         return $command->execute();
     }
 }
