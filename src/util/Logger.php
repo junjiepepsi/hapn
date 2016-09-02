@@ -71,7 +71,7 @@ class Logger
         string $dir,
         string $file,
         array $info = [],
-        int $level = self::LOG_LEVEL_DEBUG,
+        int $level = self::INT_LOG_LEVEL_DEBUG,
         int $rollType = self::NONE_ROLLING
     ) {
         if (!is_writable($dir)) {
