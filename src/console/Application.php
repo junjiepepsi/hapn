@@ -107,7 +107,7 @@ class Application extends \hapn\Application
         fwrite(STDERR, "msg:".$ex->getMessage() . PHP_EOL);
         if ($this->debug) {
             fwrite(STDERR, "trace:" . PHP_EOL);
-            fwrite(STDERR, $ex->getTraceAsString().PHP_EOL);
+            fwrite(STDERR, $ex->__toString().PHP_EOL);
         }
         echo PHP_EOL;
         exit(4);

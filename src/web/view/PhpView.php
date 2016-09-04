@@ -168,6 +168,9 @@ class PhpView implements IView
             $className = $this->helperNs . '\\' . ucfirst($name);
             $this->helpers[$name] = $helper = new $className($this);
         }
+        if (method_exists($helper, ucfirst($name))) {
+            return call_user_func_array([$helper, ucfirst($name)], $arguments);
+        }
         return call_user_func_array([$helper, 'execute'], $arguments);
     }
 

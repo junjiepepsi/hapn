@@ -400,8 +400,8 @@ class Application extends \hapn\Application
                         exit();
                     } catch (\Exception $ex) {
                         echo $ex->getMessage();
-                        echo '<pre>'.$ex->getTraceAsString().'</pre>';
-                        Logger::fatal($ex->getTraceAsString());
+                        echo '<pre>'.$ex->__toString().'</pre>';
+                        Logger::fatal($ex->__toString());
                         exit();
                     }
                 }
@@ -526,8 +526,8 @@ HTML;
 
         if (true === $this->debug) {
             echo "<pre>";
-            echo "<h1>{$ex->getMessage()}</h1>";
-            print_r($ex->getTraceAsString());
+            echo "<h1>Exception Found</h1>";
+            print_r($ex->__toString());
             echo "</pre>";
         }
 
