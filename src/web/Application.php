@@ -341,6 +341,7 @@ class Application extends \hapn\Application
             unset($error[4]);
             echo "<pre>";
             print_r($error);
+            $this->showErrorFile($error[2], $error[3]);
             echo "</pre>";
         }
         $errcode = Exception::EXCEPTION_FATAL;
@@ -400,7 +401,7 @@ class Application extends \hapn\Application
                         exit();
                     } catch (\Exception $ex) {
                         echo $ex->getMessage();
-                        echo '<pre>'.$ex->__toString().'</pre>';
+                        echo '<pre>' . $ex->__toString() . '</pre>';
                         Logger::fatal($ex->__toString());
                         exit();
                     }
@@ -443,7 +444,7 @@ HTML;
         $method = array_pop($arr);
         $clsName = trim($this->getNamespace('controller') . "\\" . implode("\\", $arr), "\\") . "\\Controller";
         $ctl = new $clsName();
-        $func = $method.Conf::get('hapn.methodExt', '');
+        $func = $method . Conf::get('hapn.methodExt', '');
         if (!method_exists($ctl, $func)) {
             throw new \Exception('app.funcNotFound func:' . $func);
         }
@@ -509,6 +510,31 @@ HTML;
         return preg_match($usererr, $errcode) > 0;
     }
 
+    private function showErrorFile($file, $line)
+    {
+        echo '<br/><h4>Code:</h4><div style="font-size:12px;border:solid 1px #CC0000;line-height:140%;">';
+
+        // Find the code line
+        $startLine = max(1, $line - 9);
+        $endLine = $line + 9;
+        $cmd = "sed -n '{$startLine},{$endLine}p' {$file}";
+        exec($cmd, $lines);
+
+        $curLine = $startLine;
+        for ($i = 0, $l = count($lines); $i < $l; $i++) {
+            echo '<div>';
+            $lines[$i] = '<span style="color:gray">' . str_pad($curLine, 4, ' ', STR_PAD_LEFT) . '</span> ' . htmlentities($lines[$i]);
+            if ($curLine == $line) {
+                $lines[$i] = '<span style="background:red;color:yellow;">' . $lines[$i] . '</span>';
+            }
+            $curLine++;
+            echo '</div>';
+        }
+
+        echo implode(PHP_EOL, $lines);
+        echo "</div>";
+    }
+
 
     /**
      * Exception handler
@@ -525,9 +551,12 @@ HTML;
         ob_start();
 
         if (true === $this->debug) {
-            echo "<pre>";
+            echo "<pre style=\"font-family:Consolas;\">";
             echo "<h1>Exception Found</h1>";
             print_r($ex->__toString());
+
+            $this->showErrorFile($ex->getFile(), $ex->getLine());
+
             echo "</pre>";
         }
 
