@@ -458,6 +458,7 @@ class Response
         $view->init([
             'tplDir' => $this->app->getDir('view'),
             'helperNs' => $this->app->getNamespace('helper'),
+            'providerNs' => $this->app->getNamespace('provider'),
         ]);
         $view->setArray($userData);
         if (!$output) {

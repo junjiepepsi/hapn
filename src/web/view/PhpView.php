@@ -19,6 +19,7 @@ class PhpView implements IView
     private $tpl;
     private $tplDir = '';
     private $helperNs = '';
+    private $providerNs = '';
     private $helpers = [];
 
     /**
@@ -49,6 +50,10 @@ class PhpView implements IView
 
         if (isset($conf['helperNs'])) {
             $this->helperNs = $conf['helperNs'];
+        }
+
+        if (isset($conf['providerNs'])) {
+            $this->providerNs = $conf['providerNs'];
         }
     }
 
@@ -215,7 +220,7 @@ class PhpView implements IView
     public function provider(string $provider, $params = [], $keyMap = [])
     {
         if ($provider[0] != "\\") {
-            $provider = rtrim($this->helperNs . "\\", "\\") . $provider;
+            $provider = rtrim($this->providerNs . "\\", "\\") . "\\".$provider;
         }
         $ret = self::invokeProvider($provider, $params);
         if (!$keyMap) {
