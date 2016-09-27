@@ -73,8 +73,13 @@ HTML;
         $viewRoot = __DIR__ . '/tpl/';
 
         $view = new PhpView();
+        $view->init(
+            [
+                'tplDir' => $viewRoot,
+            ]
+        );
         $view->setLayout($viewRoot . 'layout.phtml');
-        $view->sets($this->vars);
+        $view->setArray($this->vars);
         $view->display($viewRoot . 'body.phtml');
     }
 
@@ -86,8 +91,13 @@ HTML;
         $viewRoot = __DIR__ . '/tpl/';
 
         $view = new PhpView();
+        $view->init(
+            [
+                'tplDir' => $viewRoot,
+            ]
+        );
         $view->setLayout($viewRoot . 'layout.phtml', $viewRoot . 'layout.sub.phtml');
-        $view->sets($this->vars);
+        $view->setArray($this->vars);
         $view->display($viewRoot . 'body.phtml');
     }
 }

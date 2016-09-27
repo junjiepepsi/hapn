@@ -1,4 +1,9 @@
 <?php
+namespace hapn\tests\console;
+
+use hapn\console\Command;
+use hapn\console\Crontab;
+use hapn\util\Logger;
 
 /**
  *
@@ -8,12 +13,12 @@
  * @copyright : 2016 jiehun.com.cn
  * @filesource: CommandTest.php
  */
-class CommandTest extends PHPUnit_Framework_TestCase
+class CommandTest extends \PHPUnit_Framework_TestCase
 {
-    function testCommand()
+    public function testCommand()
     {
-        \hapn\util\Logger::init(__DIR__, 'logger');
-        $cmd = new \hapn\console\Command('php -r "echo \$aa\'hello,world\';"');
+        Logger::init(__DIR__, 'logger');
+        $cmd = new Command('php -r "echo \$aa\'hello,world\';"');
 
         $cmd->setErrorCallback(function($line){
             echo 'error found:'.$line;
@@ -22,6 +27,14 @@ class CommandTest extends PHPUnit_Framework_TestCase
         $code = $cmd->execute();
         var_dump($cmd->outputs);
         var_dump($code);
-        \hapn\util\Logger::flush();
+        Logger::flush();
+    }
+
+    public function testCrontab()
+    {
+        Logger::init(__DIR__, 'logger');
+        Crontab::addTask('foo', 5, 'http://www.baidu.com/');
+        Crontab::run();
+        Logger::flush();
     }
 }
